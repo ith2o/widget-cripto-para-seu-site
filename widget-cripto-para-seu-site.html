@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Widget CRITOs PARA SEU SITE</title>
+ 
+</head>
+<body>
+
+<!-- Medo ou ganância Widget BEGIN -->
+<div style="width: 350px; margin: 40px auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center;">
+  <h2 style="margin-bottom: 5px;">Medo ou ganância</h2>
+  <canvas id="fgGauge" width="320" height="160" style="border-radius: 12px; background: #fafafa; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></canvas>
+  <div id="fgValue" style="font-size: 32px; font-weight: 700; margin-top: 12px; color: #333;">Carregando...</div>
+  <div id="fgLabel" style="font-size: 20px; color: #666; margin-top: 4px;"></div>
+</div>
+
+<script>
+  const canvas = document.getElementById('fgGauge');
+  const ctx = canvas.getContext('2d');
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height;
+  const radius = 130;
+
+  let currentValue = 0;
+  let targetValue = 0;
+
+  function getColorLabel(value) {
+    if (value <= 20) return { color: '#d32f2f', label: 'Medo Extremo' };
+    if (value <= 40) return { color: '#f57c00', label: 'Medo' };
+    if (value <= 60) return { color: '#fbc02d', label: 'Neutro' };
+    if (value <= 80) return { color: '#7cb342', label: 'Ganância' };
+    return { color: '#388e3c', label: 'Ganância Extrema' };
+  }
+
+  function drawArc(startAngle, endAngle, color, lineWidth) {
+    ctx.beginPath();
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = color;
+    ctx.lineCap = 'round';
+    ctx.arc(centerX, centerY, radius, startAngle, endAngle, false);
+    ctx.stroke();
+  }
+
+  function drawNeedle(angle) {
+    ctx.beginPath();
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = '#444';
+    const needleX = centerX + radius * Math.cos(angle);
+    const needleY = centerY + radius * Math.sin(angle);
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(needleX, needleY);
+    ctx.stroke();
+
+    // Agulha central
+    ctx.beginPath();
+    ctx.fillStyle = '#444';
+    ctx.arc(centerX, centerY, 12, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+
+  function drawGauge(value) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Fundo do arco (arco completo)
+    const startAngle = Math.PI * 0.75;
+    const endAngle = Math.PI * 0.25;
+
+    // Fundo cinza claro
+    drawArc(startAngle, endAngle + 2 * Math.PI, '#eee', 20);
+
+    // Arco colorido baseado no valor
+    const angleRange = Math.PI * 1.5;
+    const valueAngle = startAngle + (value / 100) * angleRange;
+    const { color, label } = getColorLabel(value);
+    drawArc(startAngle, valueAngle, color, 20);
+
+    // Agulha
+    drawNeedle(valueAngle);
+
+    // Texto valor
+    ctx.font = '28px Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+    ctx.fillStyle = '#222';
+    ctx.textAlign = 'center';
+    ctx.fillText(value + '%', centerX, centerY - 30);
+
+    // Atualiza label textual fora do canvas
+    document.getElementById('fgValue').textContent = value + '%';
+    document.getElementById('fgLabel').textContent = label;
+    document.getElementById('fgLabel').style.color = color;
+  }
+
+  function animate() {
+    if (currentValue < targetValue) {
+      currentValue += 1;
+      if(currentValue > targetValue) currentValue = targetValue;
+      drawGauge(currentValue);
+      requestAnimationFrame(animate);
+    } else if (currentValue > targetValue) {
+      currentValue -= 1;
+      if(currentValue < targetValue) currentValue = targetValue;
+      drawGauge(currentValue);
+      requestAnimationFrame(animate);
+    } else {
+      drawGauge(currentValue);
+    }
+  }
+
+  async function fetchFearGreedIndex() {
+    try {
+      const res = await fetch('https://api.alternative.me/fng/');
+      const json = await res.json();
+      targetValue = parseInt(json.data[0].value);
+      animate();
+    } catch (error) {
+      document.getElementById('fgValue').textContent = 'Erro ao carregar';
+      document.getElementById('fgLabel').textContent = '';
+      console.error('Erro ao buscar índice Fear & Greed:', error);
+    }
+  }
+
+  // Inicializa com 0%
+  drawGauge(0);
+  fetchFearGreedIndex();
+</script>
+<!-- Medo ou ganância END -->
+
+
+
+<!-- TradingView Crypto Coins Heatmap Widget BEGIN -->
+<div style="width: 100%; max-width: 800px; margin: auto;">
+  <iframe
+    src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_7e339&symbol=BINANCE:BTCUSDT&interval=1D&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=light&style=1&timezone=Etc%2FUTC&withdateranges=1&hidevolume=1&hidelegend=1&enablepublishing=0&allow_symbol_change=1&details=0&hotlist=0&calendar=0&news=0"
+    width="100%" height="450" frameborder="0" allowtransparency="true" scrolling="no" style="border-radius: 10px;">
+  </iframe>
+</div>
+<!-- TradingView Crypto Coins Heatmap Widget END -->
+
+
+
+<!-- TradingView Widget BEGIN -->
+<iframe src="https://s.tradingview.com/embed-widget/symbol-overview/?locale=br#%7B%22symbols%22%3A%5B%5B%22BINANCE%3ABTCUSDT%22%5D%5D%2C%22width%22%3A%22100%25%22%2C%22height%22%3A500%2C%22theme%22%3A%22light%22%7D" 
+width="100%" height="500" frameborder="0" allowtransparency="true" scrolling="no" style="border: none;"></iframe>
+<!-- TradingView Widget END -->
+
+</body>
+</html>
